@@ -1,0 +1,337 @@
+================================= SET A =================================
+=========================================================================
+a) fydb57=> \d owner
+               Table "public.owner"
+   Column    |          Type          | Modifiers 
+-------------+------------------------+-----------
+ owner_id    | integer                | not null
+ name        | character varying(50)  | 
+ birth_date  | date                   | 
+ birth_place | character varying(100) | 
+Indexes:
+    "owner_pkey" PRIMARY KEY, btree (owner_id)
+
+b) INSERT INTO Owner values(101,'Mr. Paranjpe','1986-09-23','Pune');
+c) INSERT INTO Owner values(102,'Mr. Vardhman','1906-05-02','Navi Mumbai'); 
+
+d) fydb57=> SELECT * FROM Owner;
+owner_id |     name     | birth_date | birth_place 
+----------+--------------+------------+-------------
+      101 | Mr. Paranjpe | 1986-09-23 | Pune
+      102 | Mr. Vardhman | 1906-05-02 | Navi Mumbai
+(2 rows)
+
+e) UPDATE Owner set name = 'Mr. Rathod' where Owner_id = 101;
+
+fydb57=> SELECT * FROM Owner;
+ owner_id |     name     | birth_date | birth_place 
+----------+--------------+------------+-------------
+      102 | Mr. Vardhman | 1906-05-02 | Navi Mumbai
+      101 | Mr. Rathod   | 1986-09-23 | Pune
+(2 rows)
+
+f) DELETE FROM Owner where Owner_id=102;
+
+fydb57=> SELECT * FROM Owner;
+ owner_id |    name    | birth_date | birth_place 
+----------+------------+------------+-------------
+      101 | Mr. Rathod | 1986-09-23 | Pune
+(1 row)
+
+==========================================================================
+
+g) fydb57=> \d Project1;
+                 Table "public.project1"
+       Column        |         Type          | Modifiers 
+---------------------+-----------------------+-----------
+ project_id          | integer               | not null
+ project_name        | character varying(30) | 
+ project_description | text                  | 
+ status              | boolean               | 
+Indexes:
+    "project1_pkey" PRIMARY KEY, btree (project_id)
+    "project1_project_description_key" UNIQUE CONSTRAINT, btree (project_description)
+
+h) INSERT INTO Project1 values(201,'Chandrayan3','Trip to Moon','Y');
+i) INSERT INTO Project1 values(202,'Chandrayan2','To study the Moon surface','N');
+
+fydb57=> SELECT * FROM Project1;
+ project_id | project_name |    project_description    | status 
+------------+--------------+---------------------------+--------
+        201 | Chandrayan3  | Trip to Moon              | t
+        202 | Chandrayan2  | To study the Moon surface | f
+
+j) UPDATE Project1 set project_id = 111 where project_id = 201;
+
+ project_id | project_name |    project_description    | status 
+------------+--------------+---------------------------+--------
+        202 | Aditiya L1   | To study the Moon surface | f
+        111 | Chandrayan3  | Trip to Moon              | t
+ 
+
+k) UPDATE Project1 set project_name = 'Aditya L1' where project_id = 202; 
+
+fydb57=> SELECT * FROM Project1;
+ project_id | project_name |    project_description    | status 
+------------+--------------+---------------------------+--------
+        111 | Chandrayan3  | Trip to Moon              | t
+        202 | Aditya L1    | To study the Moon surface | f
+
+
+l) Select * from Project1;
+
+fydb57=> Select * from Project1;
+ project_id | project_name |    project_description    | status 
+------------+--------------+---------------------------+--------
+        111 | Chandrayan3  | Trip to Moon              | t
+        202 | Aditya L1    | To study the Moon surface | f
+
+==========================================================================
+
+m) fydb57=> \d donor1
+              Table "public.donor1"
+   Column    |         Type          | Modifiers 
+-------------+-----------------------+-----------
+ donor_no    | integer               | not null
+ donor_name  | character varying(30) | not null
+ blood_group | character(10)         | 
+Indexes:
+    "donor_pkey" PRIMARY KEY, btree (donor_no)
+
+n) INSERT INTO Donor1 values(501,'Mr. Patil','O'); 
+
+o) Delete from Donor1 Where donor_name = 'Mr. Patil';
+
+p)Select * from donor1; 
+fydb57=> Select * from donor1;
+ donor_no | donor_name | blood_group 
+----------+------------+-------------
+(0 rows)
+
+=============================== SET B ===================================
+==========================================================================
+
+CREATE TABLE Person(p_id int PRIMARY KEY, p_name varchar(20), p_address text, p_age int);
+
+CREATE TABLE Passport(p_no int PRIMARY KEY, expiry_date date, p_id int unique references person on delete cascade on update set null);
+
+i. 
+INSERT INTO Person(p_id, p_name, p_address,  p_age)
+VALUES
+(1, 'Adam', '123 Elm St', 19),
+(2, 'Joel', '123 Elm St', 27),
+(3, 'Priscilla', '123 Elm St', 26),
+(4, 'Diluc', '123 Elm St', 35),
+(5, 'Kaeya', '123 Elm St', 21);
+
+fydb57=> Select * from person;
+ p_id |  p_name   | p_address  | p_age 
+------+-----------+------------+-------
+    1 | Adam      | 123 Elm St |    19
+    2 | Joel      | 123 Elm St |    27
+    3 | Priscilla | 123 Elm St |    26
+    4 | Diluc     | 123 Elm St |    35
+    5 | Kaeya     | 123 Elm St |    21
+(5 rows)
+
+ii. 
+INSERT INTO Passport(p_no, expiry_date, p_id)
+VALUES
+(1001, '2024-04-30', 1),
+(1002, '2026-12-08', 2),
+(1003, '2032-01-29', 3),
+(1004, '2025-04-06', 4),
+(1005, '2023-03-16', 5);
+
+iii. DELETE from Person where p_id=2;
+fydb57=> Select * from person;
+ p_id |  p_name   | p_address  | p_age 
+------+-----------+------------+-------
+    1 | Adam      | 123 Elm St |    19
+    3 | Priscilla | 123 Elm St |    26
+    4 | Diluc     | 123 Elm St |    35
+    5 | Kaeya     | 123 Elm St |    21
+(4 rows)
+
+iv. 
+UPDATE Person
+SET p_name = 'Eve'
+WHERE p_name LIKE 'P%';
+
+fydb57=> Select * from person;
+ p_id |  p_name   | p_address  | p_age 
+------+-----------+------------+-------
+    1 | Adam      | 123 Elm St |    19
+    3 | Priscilla | 123 Elm St |    26
+    4 | Diluc     | 123 Elm St |    35
+    5 | Kaeya     | 123 Elm St |    21
+(4 rows)
+
+2. 
+CREATE TABLE Property(
+property_id int PRIMARY KEY,
+property_desc text,
+area varchar(30),
+rate float,
+owner_id int UNIQUE REFERENCES owner on DELETE CASCADE on UPDATE SET NULL);
+
+a. 
+INSERT INTO Property(property_id, property_desc, area, rate, owner_id)
+VALUES
+(101, 'Villa', 'Pune', 1500000, 1),
+(102, 'Condo', 'Delhi', 1000000, 2),
+(103, 'Apartment', 'Berlin', 800000, 3),
+(104, 'Bungalow', 'Grecce', 2000000, 4),
+(105, 'Pent House', 'NY', 9000000, 5);
+
+fydb57=> Select * from property;
+ property_id | property_desc |  area  |  rate   | owner_id 
+-------------+---------------+--------+---------+----------
+         101 | Villa         | Pune   | 1500000 |        1
+         102 | Condo         | Delhi  | 1000000 |        2
+         103 | Apartment     | Berlin |  800000 |        3
+         104 | Bungalow      | Grecce | 2000000 |        4
+         105 | Pent House    | NY     | 9000000 |        5
+(5 rows)
+
+
+b. 
+INSERT INTO Owner(Owner_id, name, birth_date, birth_place)
+VALUES
+(1, 'Mr. Joshi', '1990-04-06', 'Bombay'),
+(2, 'Mr. Patel', '1985-03-16', 'Pune'),
+(3, 'Mr. Sathe', '1992-02-20', 'Delh'),
+(4, 'Mrs. Kumar', '1980-11-24', 'Madras'),
+(5, 'Mr. Shah', '1974-01-29', 'Kolkata');
+
+fydb57=> Select * from owner;
+ owner_id |    name    | birth_date | birth_place 
+----------+------------+------------+-------------
+        1 | Mr. Joshi  | 1990-04-06 | Bombay
+        2 | Mr. Patel  | 1985-03-16 | Pune
+        3 | Mr. Sathe  | 1992-02-20 | Delh
+        4 | Mrs. Kumar | 1980-11-24 | Madras
+        5 | Mr. Shah   | 1974-01-29 | Kolkata
+(5 rows)
+
+c.
+UPDATE Owner 
+SET name = 'Mr. Raj'
+WHERE name = 'Mr. Sathe';
+
+fydb57=> Select * from owner;
+ owner_id |    name    | birth_date | birth_place 
+----------+------------+------------+-------------
+        1 | Mr. Joshi  | 1990-04-06 | Bombay
+        2 | Mr. Patel  | 1985-03-16 | Pune
+        4 | Mrs. Kumar | 1980-11-24 | Madras
+        5 | Mr. Shah   | 1974-01-29 | Kolkata
+        3 | Mr. Raj    | 1992-02-20 | Delh
+(5 rows)
+
+d. 
+DELETE FROM property
+WHERE area = 'Pune' AND owner_id = (Select owner_id FROM owner WHERE name = 'Mr. Joshi');
+
+fydb57=> Select * from property;
+ property_id | property_desc |  area  |  rate   | owner_id 
+-------------+---------------+--------+---------+----------
+         102 | Condo         | Delhi  | 1000000 |        2
+         103 | Apartment     | Berlin |  800000 |        3
+         104 | Bungalow      | Grecce | 2000000 |        4
+         105 | Pent House    | NY     | 9000000 |        5
+(4 rows)
+
+3. 
+CREATE TABLE Movie(
+mvno int PRIMARY KEY,
+mvname varchar(20),
+releaseyear int CHECK(releaseyear>0));
+
+CREATE TABLE Actor(
+actno int PRIMARY KEY,
+actname varchar(20));
+
+CREATE TABLE MovieActor(
+mvno int REFERENCES Movie on DELETE CASCADE on UPDATE SET NULL,
+actno int REFERENCES Actor on DELETE CASCADE on UPDATE SET NULL, PRIMARY KEY(mvno,actno));
+
+fydb57=> \d MovieActor
+  Table "public.movieactor"
+ Column |  Type   | Modifiers 
+--------+---------+-----------
+ mvno   | integer | not null
+ actno  | integer | not null
+Indexes:
+    "movieactor_pkey" PRIMARY KEY, btree (mvno, actno)
+Foreign-key constraints:
+    "movieactor_actno_fkey" FOREIGN KEY (actno) REFERENCES actor(actno) ON UPDATE SET NULL ON DELETE CASCADE
+    "movieactor_mvno_fkey" FOREIGN KEY (mvno) REFERENCES movie(mvno) ON UPDATE SET NULL ON DELETE CASCADE
+
+I. 
+INSERT INTO movie(mvno,mvname, releaseyear)
+VALUES
+(1, 'Movie A', 2010),
+(2, 'Movie B', 2015),
+(3, 'Movie C', 2018),
+(4, 'Movie D', 2020),
+(5, 'Movie E', 2023);
+
+fydb57=> Select * from movie;
+ mvno | mvname  | releaseyear 
+------+---------+-------------
+    1 | Movie A |        2010
+    2 | Movie B |        2015
+    3 | Movie C |        2018
+    4 | Movie D |        2020
+    5 | Movie E |        2023
+
+II.
+INSERT INTO actor(actno, actname)
+VALUES
+(101, 'Actor 1'),
+(102, 'Actor 2'),
+(103, 'Actor 3'),
+(104, 'Actor 4'),
+(105, 'Actor 5');
+
+fydb57=> Select * from actor;
+ actno | actname
+-------+---------
+   101 | Actor 1
+   102 | Actor 2
+   103 | Actor 3
+   104 | Actor 4
+   105 | Actor 5
+(5 rows)
+
+
+III.
+INSERT INTO MovieActor(mvno, actno)
+VALUES
+(1, 101),
+(2, 102),
+(3, 103),
+(4, 104),
+(5, 105);
+
+fydb57=> Select * from movieactor;
+ mvno | actno 
+------+-------
+    1 |   101
+    2 |   102
+    3 |   103
+    4 |   104
+    5 |   105
+(5 rows)
+
+
+
+
+
+
+
+
+
+
+

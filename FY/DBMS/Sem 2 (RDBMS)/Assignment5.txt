@@ -1,0 +1,233 @@
+Friday 15 March 2024 11:39:07 AM IST 
+
+================================================================SET A==================================================================================
+
+CREATE TABLE Movie1(
+m_no int PRIMARY KEY,
+m_name varchar(20),
+releaseyear int CHECK(releaseyear>0),
+budget int);
+
+CREATE TABLE Actor1(
+a_no int PRIMARY KEY,
+a_name varchar(20),
+role varchar(30),
+charges int,
+a_address varchar(30));
+
+CREATE TABLE MovieActor1(
+m_no int REFERENCES Movie1 on DELETE CASCADE on UPDATE SET NULL,
+a_no int REFERENCES Actor1 on DELETE CASCADE on UPDATE SET NULL, PRIMARY KEY(m_no,a_no));
+
+INSERT INTO movie1(m_no, m_name, releaseyear, budget)
+VALUES
+(1, 'Movie A', 2010, 100000),
+(2, 'Movie B', 2015, 200000),
+(3, 'Movie C', 2018, 230000);
+
+INSERT INTO actor1(a_no, a_name, role, charges, a_address)
+VALUES
+(101, 'Actor 1','Supporting', 120000, 'aaa'),
+(102, 'Actor 2','Protaganist',320000, 'bbb'),
+(103, 'Actor 3','Antagonist', 340000, 'ccc');
+
+INSERT INTO MovieActor1(m_no, a_no)
+VALUES
+(1, 101),
+(2, 102),
+(3, 103);
+
+a.
+CREATE TRIGGER rec_delAct before DELETE on actor1 for each row EXECUTE procedure rec_delA();
+
+CREATE OR REPLACE FUNCTION rec_delA() RETURNS trigger as'
+BEGIN
+RAISE NOTICE ''Actor - % has been deleted/removed'',old.a_no;
+RETURN OLD;
+END;
+'language 'plpgsql';
+
+CREATE OR REPLACE FUNCTION rec_delA() RETURNS trigger as'
+BEGIN
+RAISE NOTICE ''Actor has been deleted/removed'';
+RETURN OLD;
+END;
+'language 'plpgsql';
+
+	fydb57=> delete from actor1 where a_no=101;
+	NOTICE:  Actor has been deleted/removed
+	DELETE 1
+
+
+b. 
+CREATE OR REPLACE FUNCTION UPDATE_movieTRIG() returns trigger as'
+BEGIN 
+IF old.m_name<>NEW.m_name then
+RAISE NOTICE ''Movie has been UPDATEd to %'',NEW.m_name;
+END IF;
+RETURN NEW;
+END;
+'language 'plpgsql';
+
+CREATE TRIGGER up_Movie before UPDATE of m_name on movie1 for each row EXECUTE procedure UPDATE_movieTRIG();
+
+	fydb57=> UPDATE movie1 set m_name='Movie C (UPDATEd)' where m_name 	='Movie C';
+	NOTICE:  Movie has been UPDATEd to Movie C (UPDATEd)
+	UPDATE 1
+
+c. 
+CREATE OR REPLACE FUNCTION ins_budgetTRIG() returns trigger as'
+BEGIN 
+IF NEW.budget<100000 then
+RAISE Exception ''Budget is below 100000'';
+ELSE 
+RAISE NOTICE ''NEW budget has been inserted'';
+END IF;
+RETURN NEW;
+END;
+'language 'plpgsql';
+
+CREATE TRIGGER ins_budget before INSERT on movie1 for each row EXECUTE procedure ins_budgetTRIG();
+
+fydb57=> insert into movie1 values(5,'Movie E',2024,90000);
+ERROR:  Budget is below 100000
+CONTEXT:  PL/pgSQL function ins_budgettrig() line 4 at RAISE
+
+fydb57=> insert into movie1 values(6,'Movie F',2024,200000);
+NOTICE:  NEW budget has been inserted
+INSERT 0 1
+
+=================================================================SET B=================================================================================
+
+CREATE TABLE Doctor(
+d_no int PRIMARY KEY,
+name varchar(30),
+specialization varchar(30),
+charges int,
+h_no int references hospital on UPDATE set null on delete cascade);
+
+CREATE TABLE Hospital(
+h_no int PRIMARY KEY,
+h_name varchar(20),
+city varchar(10));
+
+INSERT INTO Doctor(d_no, name, specialization, charges)
+VALUES
+(1, 'Dr. A', 'Neurologist', 1000000),
+(2, 'Dr. B', 'Cardiologist', 750000),
+(3, 'Dr. C', 'Opthomologist', 430000);
+
+INSERT INTO Hospital(h_no, h_name, city)
+VALUES
+(101, 'Hospital A','aaa'),
+(102, 'Hospital B','bbb'),
+(103, 'Hospital C','ccc');
+
+a.
+CREATE OR REPLACE FUNCTION doc_charges()
+returns trigger as'
+BEGIN 
+IF NEW.charges<0 then
+RAISE exception''charges cannot be less than zero'';
+END IF;
+RETURN NEW;
+END;
+'language 'plpgsql';
+
+CREATE TRIGGER check_charges before INSERT or UPDATE on doctor for each row execute procedure doc_charges();
+
+	fydb57=> insert into doctor values(4,'Dr. D','Dermatologist',-1);
+	ERROR:  charges cannot be less than zero
+	CONTEXT:  PL/pgSQL function doc_charges() line 4 at RAISE
+
+b.
+CREATE OR REPLACE FUNCTION del_hosN() returns trigger as'
+BEGIN
+RAISE notice''The hospital name has been deleted'';
+RETURN old;
+END;
+'language'plpgsql';
+   
+CREATE TRIGGER del_hosN_TRIG after DELETE on hospital for each row execute procedure del_hosN();
+
+	fydb57=> delete from hospital where h_no=101;
+	NOTICE:  The hospital name has been deleted
+	DELETE 1
+
+c.
+CREATE OR REPLACE FUNCTION dname_check()
+returns trigger as'
+BEGIN
+IF NEW.name not like ''Dr.%'' then
+RAISE exception ''The doctor name should start with Dr.'';
+END IF;
+RETURN NEW;
+END;
+'language'plpgsql';
+
+CREATE TRIGGER dname_checkTRIG before UPDATE on doctor for each row execute procedure dname_check();
+
+fydb57=> update doctor set name='A' where d_no=1;
+ERROR:  The doctor name should start with Dr.
+CONTEXT:  PL/pgSQL function dname_check() line 4 at RAISE
+
+=================================================================SET C=================================================================================
+
+a.
+CREATE OR REPLACE FUNCTION person_details(aname varchar(30))
+returns void as'
+declare
+a_name alias for $1;
+c_details cursor for select * from person, area where area.pno=person.pno and area.aname=$1;
+dets record;
+begin
+open c_details;
+loop
+fetch c_details into dets;
+if not found then 
+exit;
+end if;
+raise notice''No. - %, Name - %, Area - %, Type - %, Birthdate - %'',dets.pno,dets.name,dets.aname,dets.area_type,dets.birthdate;
+exit when not found;
+end loop;
+close c_details;
+end;
+'language 'plpgsql';
+
+	fydb57=> Select person_details('AreaA');
+	NOTICE:  No. - 3, Name - Joelyn, Area - AreaA, Type - Urban, Birthdate - 2003-06-08
+	 person_details 
+	----------------
+ 
+	(1 row)
+
+b.
+CREATE OR REPLACE FUNCTION get_income(income int)
+returns void as'
+declare
+income alias for $1;
+C_pname cursor for select name from person where person.income>$1;
+dets record;
+begin
+open c_pname;
+loop
+fetch c_pname into dets;
+if not found then
+exit;
+end if;
+raise notice''Person name is % '',dets.name;
+if $1<0 then
+raise notice''Income cannot less than zero'';
+end if;
+end loop;
+close c_pname;
+end;
+'language 'plpgsql';
+
+	fydb57=> select get_income(99000);
+	NOTICE:  Person name is Joel 
+	 get_income 
+	------------
+ 
+	(1 row)
+

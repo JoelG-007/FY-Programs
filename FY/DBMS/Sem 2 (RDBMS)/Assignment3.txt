@@ -1,0 +1,165 @@
+==========SET A==========
+CREATE TABLE bus(
+	bus_no int PRIMARY KEY,
+	capacity int,
+	depo_name varchar(20)
+);
+CREATE TABLE route(
+	route_no int PRIMARY KEY,
+	source varchar(20),
+	destination varchar(20),
+	no_of_stations int
+);
+CREATE TABLE busRoute(
+	bus_no int references bus on delete cascade on update set null,
+	route_no int references route on delete cascade on update set null,
+	PRIMARY KEY(bus_no,route_no)
+);
+
+INSERT INTO bus(bus_no,capacity,depo_name)
+VALUES
+(100,50,'AaA'),
+(110,45,'BbB'),
+(111,60,'CcC');
+
+INSERT INTO route(route_no,source,destination, no_of_stations)
+VALUES
+(200,'Station','Airport',3),
+(210,'Airport','Station',2),
+(211,'City','Beach',2);
+
+INSERT INTO busroute(bus_no,route_no)
+VALUES
+(100,200),
+(110,211),
+(111,211),
+(111,200);
+
+1.
+CREATE OR REPLACE function route_dets() returns void as'
+DECLARE
+c1 cursor for select route.route_no,source,destination,no_of_stations
+from bus,route,busroute WHERE bus.bus_no=busroute.bus_no AND route.route_no=busroute.route_no AND bus.bus_no=110; 
+BEGIN
+FOR route_detail in c1
+LOOP
+RAISE NOTICE ''% % % %'',route_detail.route_no,route_detail.source,route_detail.destination,route_detail.no_of_stations;
+END LOOP;
+END;
+'language 'plpgsql';
+
+CREATE FUNCTION
+fydb57=> SELECT route_dets();
+NOTICE:  211 City Beach 2
+CONTEXT:  PL/pgSQL function route_dets() line 8 at RAISE
+ route_dets 
+------------
+ 
+(1 row)
+
+2.
+CREATE OR REPLACE function statoair() returns void as'
+DECLARE 
+c1 cursor for select bus.bus_no,capacity,depo_name from bus,route,busroute WHERE bus.bus_no=busroute.bus_no AND route.route_no=busroute.route_no AND source=''Station'' AND destination=''Airport'';
+BEGIN
+FOR busrec in c1
+LOOP
+RAISE NOTICE ''Bus Number - % Capacity - % Dept. Name - %'',busrec.bus_no,busrec.capacity,busrec.depo_name;
+END LOOP;
+END;
+'language 'plpgsql';
+
+fydb57=> SELECT statoair();
+NOTICE:  Bus Number - 100 Capacity - 50 Dept. Name - AaA
+CONTEXT:  PL/pgSQL function statoair() line 7 at RAISE
+NOTICE:  Bus Number - 111 Capacity - 60 Dept. Name - CcC
+CONTEXT:  PL/pgSQL function statoair() line 7 at RAISE
+ statoair 
+----------
+ 
+(1 row)
+
+
+=========================SET B========================
+
+CREATE TABLE person(
+	pno int PRIMARY KEY,
+	name varchar(20),
+	birthdate date,
+	income float
+);
+
+CREATE TABLE area(
+	aid int PRIMARY KEY,
+	aname varchar(20),
+	area_type varchar(20) CHECK((area_type)IN('Urban','Rural')),
+	pno int references person on delete cascade on update set null
+);
+
+INSERT INTO person(pno,name,birthdate,income)
+VALUES
+(1,'James','1999-02-23',68000),
+(2,'Joel','2005-02-28',999990),
+(3,'Joelyn','2003-06-8',49000);
+
+INSERT INTO area(aid, aname, area_type, pno)
+VALUES
+(011,'AreaA','Urban',3),
+(101,'AreaB','Urban',2),
+(110,'AreaC','Rural',1);
+
+a.
+CREATE OR REPLACE FUNCTION getperson(pmonth int) returns void as'
+DECLARE
+c1 cursor FOR SELECT name from person WHERE EXTRACT(month from birthdate)=pmonth; 
+BEGIN
+For personrec in c1
+LOOP
+RAISE NOTICE ''%'',personrec.name;
+END LOOP;
+END;
+'language 'plpgsql';
+
+fydb57=> SELECT getperson(2);
+NOTICE:  James
+CONTEXT:  PL/pgSQL function getperson(integer) line 7 at RAISE
+NOTICE:  Joel
+CONTEXT:  PL/pgSQL function getperson(integer) line 7 at RAISE
+ getperson 
+-----------
+ 
+(1 row)
+
+b.
+CREATE OR REPLACE FUNCTION getpersonArea() returns void as'
+DECLARE
+c1 cursor FOR SELECT area,name from person,area WHERE area_type = ''Urban'';
+BEGIN
+FOR personrec in c1 loop
+RAISE NOTICE ''Name - %'',personrec.name;
+END LOOP;
+END;
+'language 'plpgsql';
+
+
+c.
+CREATE OR REPLACE FUNCTION getincome(minIC int, maxIC int) returns void as'
+DECLARE
+c1 cursor FOR SELECT name,income from person WHERE income between minIC AND maxIC;
+BEGIN
+FOR personrec in c1
+LOOP
+RAISE NOTICE ''Name - %'',personrec.name;
+END LOOP;
+END;
+'language 'plpgsql';
+
+fydb57=> SELECT getincome(50000,100000);
+NOTICE:  Name - James
+CONTEXT:  PL/pgSQL function getincome(integer,integer) line 7 at RAISE
+ getincome 
+-----------
+ 
+(1 row)
+
+

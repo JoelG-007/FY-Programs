@@ -1,0 +1,261 @@
+CREATE TABLE department4(deptno int PRIMARY KEY, dname varchar(30), dlocation text);
+
+CREATE TABLE employee4(empno int PRIMARY KEY, name varchar(20), address text, salary int, deptno int references department4 on delete cascade on update set null);
+
+INSERT INTO department4(deptno, dname, dlocation)
+VALUES
+(1,'Science','Pune'),
+(2,'Commerce','Bombay'),
+(3,'Arts','Nagpur');
+
+INSERT INTO person4(empno, name, address, salary, deptno)
+VALUES
+(100,'Adam','123 aaa',70000,1),
+(101,'Belle','456 bbb',90000,1),
+(102,'Cent','789 ccc',63000,2),
+(103,'Dan','1011 ddd',78000,3),
+(104,'Eve','1213 eee',59000,2);
+
+1.
+SELECT * FROM employee4;
+
+fydb57=> SELECT * FROM employee4;
+ empno | name  | address  | salary | deptno 
+-------+-------+----------+--------+--------
+   100 | Adam  | 123 aaa  |  70000 |      1
+   101 | Belle | 456 bbb  |  90000 |      1
+   102 | Cent  | 789 ccc  |  63000 |      2
+   103 | Dan   | 1011 ddd |  78000 |      3
+   104 | Eve   | 1213 eee |  59000 |      2
+(5 rows)
+
+
+2.
+SELECT * FROM department4;
+
+fydb57=> SELECT * FROM department4;
+ deptno |  dname   | dlocation 
+--------+----------+-----------
+      1 | Science  | Pune
+      2 | Commerce | Bombay
+      3 | Arts     | Nagpur
+(3 rows)
+
+
+3.
+SELECT DISTINCT name FROM employee4;
+
+fydb57=> SELECT DISTINCT name FROM employee4;
+ name  
+-------
+ Dan
+ Eve
+ Belle
+ Cent
+ Adam
+(5 rows)
+
+4.
+SELECT dname, dlocation FROM department4;
+
+fydb57=> SELECT dname, dlocation FROM department4;
+  dname   | dlocation 
+----------+-----------
+ Science  | Pune
+ Commerce | Bombay
+ Arts     | Nagpur
+(3 rows)
+
+5.
+SELECT * FROM employee4 WHERE address = 'Pune' and salary >60000 AND salary < 90000;
+
+fydb57=> SELECT * FROM employee4 WHERE address = '123 aaa' and salary >70000 AND salary < 90000;
+ empno | name | address | salary | deptno 
+-------+------+---------+--------+--------
+(0 rows)
+
+
+6.
+SELECT * from department4 WHERE dname like 'C%';
+
+fydb57=> SELECT * from department4 WHERE dname like 'C%';
+ deptno |  dname   | dlocation 
+--------+----------+-----------
+      2 | Commerce | Bombay
+(1 row)
+
+
+7.
+SELECT * FROM department4 WHERE dname like '%sci%';
+
+fydb57=> SELECT * FROM department4 WHERE dname like '%Sci%';
+ deptno |  dname  | dlocation 
+--------+---------+-----------
+      1 | Science | Pune
+(1 row)
+
+8. 
+SELECT * FROM employee4 order by deptno desc ;
+
+fydb57=> SELECT * FROM employee4 order by deptno desc ;
+ empno | name  | address  | salary | deptno 
+-------+-------+----------+--------+--------
+   103 | Dan   | 1011 ddd |  78000 |      3
+   102 | Cent  | 789 ccc  |  63000 |      2
+   104 | Eve   | 1213 eee |  59000 |      2
+   100 | Adam  | 123 aaa  |  70000 |      1
+   101 | Belle | 456 bbb  |  90000 |      1
+
+SELECT * FROM employee4 order by empno desc ;
+
+fydb57=> SELECT * FROM employee4 order by empno desc ;
+ empno | name  | address  | salary | deptno 
+-------+-------+----------+--------+--------
+   104 | Eve   | 1213 eee |  59000 |      2
+   103 | Dan   | 1011 ddd |  78000 |      3
+   102 | Cent  | 789 ccc  |  63000 |      2
+   101 | Belle | 456 bbb  |  90000 |      1
+   100 | Adam  | 123 aaa  |  70000 |      1
+(5 rows)
+
+9. 
+SELECT avg(salary) FROM employee4;
+
+fydb57=> SELECT avg(salary) FROM employee4;
+        avg         
+--------------------
+ 72000.000000000000
+(1 row)
+
+10.
+SELECT deptno, sum(salary) as total_salary from employee4 group by deptno;
+
+fydb57=> SELECT deptno, sum(salary) as total_salary from employee4 group by deptno;
+ deptno | total_salary 
+--------+--------------
+      3 |        78000
+      2 |       122000
+      1 |       160000
+(3 rows)
+
+
+12.
+SELECT dname, count(*) FROM employee4, department4 WHERE employee4.deptno=department4.deptno GROUP by dname having count(*)>3;
+
+fydb57=> SELECT dname, count(*) FROM employee4, department4 WHERE employee4.deptno=department4.deptno GROUP by dname having count(*)>3;
+ dname | count 
+-------+-------
+(0 rows)
+
+
+===============================SET B=====================================
+CREATE TABLE person4(pnumber int PRIMARY KEY,pname varchar(30),birthdate date, income float, aname varchar references area4 on delete cascade on update set null);
+
+CREATE TABLE area4(aname varchar(20) PRIMARY KEY , area_type varchar(30) CHECK((area_type)IN('Urban','Rural')));
+
+INSERT INTO area4(aname, area_type)
+VALUES
+('Area 1','Rural'),
+('Area 2','Urban'),
+('Area 3','Urban'),
+('Area 4','Rural');
+
+INSERT INTO person4(pnumber,pname, birthdate,income, aname)
+VALUES
+(101,'aaa','2012-02-21',90000,'Area 1'),
+(102,'bbb','2030-12-25',80000,'Area 2'),
+(103,'ccc','2016-09-8',300000,'Area 2'),
+(104,'ddd','2019-04-06',54800,'Area 3');
+
+1
+SELECT pname from person4,area4 where person4.aname=area4.aname AND area_type='Urban';
+
+fydb57=> SELECT pname from person4,area4 where person4.aname=area4.aname AND area_type='Urban';
+ pname 
+-------
+ bbb
+ ccc
+ ddd
+(3 rows)
+
+
+2.
+Select min(income) from person4;
+fydb57=> Select min(income) from person4;
+  min  
+-------
+ 54800
+(1 row)
+
+3. 
+SELECT * from person4 order by pnumber desc;
+
+fydb57=> SELECT * from person4 order by pnumber desc;
+ pnumber | pname | birthdate  | income | aname  
+---------+-------+------------+--------+--------
+     104 | ddd   | 2019-04-06 |  54800 | Area 3
+     103 | ccc   | 2016-09-08 | 300000 | Area 2
+     102 | bbb   | 2030-12-25 |  80000 | Area 2
+     101 | aaa   | 2012-02-21 |  90000 | Area 1
+
+4.
+SELECT * from person4 where pname like 'b%';
+
+fydb57=> SELECT * from person4 where pname like 'b%';
+ pnumber | pname | birthdate  | income | aname  
+---------+-------+------------+--------+--------
+     102 | bbb   | 2030-12-25 |  80000 | Area 2
+(1 row)
+
+5. 
+SELECT * from person4 where pname like '____';
+
+fydb57=> SELECT * from person4 where pname like '____';
+ pnumber | pname | birthdate | income | aname 
+---------+-------+-----------+--------+-------
+(0 rows)
+
+6.
+SELECT COUNT(*) from person4 where person4.income<80000;
+
+fydb57=> SELECT COUNT(*) from person4 where person4.income<80000;
+ count 
+-------
+     1
+(1 row)
+
+7. 
+SELECT sum(income) as income_rural from person4,area4 where person4.aname=area4.aname and area_type = 'Rural';
+
+fydb57-> area4.aname and area_type = 'Rural';
+ income_rural 
+--------------
+        90000
+(1 row)
+
+
+8.
+SELECT COUNT(*) from area4 where area_type='Urban';
+
+fydb57=> SELECT COUNT(*) from area4 where area_type='Urban'; 
+ count 
+-------
+     2
+(1 row) 
+
+9.
+SELECT pname from person4 where EXTRACT(month from birthdate)=4;
+
+fydb57=> SELECT pname from person4 where EXTRACT(month from birthdate)=4;
+ pname 
+-------
+ ddd
+(1 row) 
+
+10.
+SELECT aname,COUNT(*) from person4 group by aname having count(*)>3;
+
+fydb57=> SELECT aname,COUNT(*) from person4 group by aname having count(*)>3;
+ aname | count 
+-------+-------
+(0 rows)

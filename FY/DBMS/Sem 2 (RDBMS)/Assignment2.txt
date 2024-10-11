@@ -1,0 +1,306 @@
+1.
+CREATE OR REPLACE FUNCTION get_max(a int, b int) RETURNS int as '
+DECLARE 
+max int;
+BEGIN
+IF a>b THEN
+max:=a;
+ELSE 
+max:=b;
+END IF;
+RETURN max;
+END;
+'language 'plpgsql';
+
+fydb57=> SELECT get_max(9,1);
+ get_max 
+---------
+       9
+(1 row)
+
+2.
+CREATE OR REPLACE FUNCTION check_num(a int) RETURNS varchar as '
+DECLARE 
+status varchar(20);
+BEGIN
+IF a>0 THEN
+status := 'Positive';
+ELSEIF a<0 THEN
+status:='Negative';
+ELSE 
+status:='Zero';
+END IF;
+RETURN status;
+END;
+'language 'plpgsql';
+
+fydb57=> SELECT check_num(-9)
+fydb57-> ;
+ check_num 
+-----------
+ Negative
+(1 row)
+
+fydb57=> SELECT check_num(2);
+ check_num 
+-----------
+ Positive
+(1 row)
+
+fydb57=> SELECT check_num(0);
+ check_num 
+-----------
+ Zero
+(1 row)
+
+3.
+CREATE OR REPLACE FUNCTION eve_odd(a int) returns varchar as '
+DECLARE 
+status varchar(20);
+BEGIN
+IF a%2=0 THEN
+status := 'EVEN';
+ELSE 
+status := 'ODD';
+END IF;
+RETURN status;
+END;
+'language 'plpgsql';
+
+fydb57=> select eve_odd(22);
+ eve_odd 
+---------
+ EVEN
+(1 row)
+
+fydb57=> select eve_odd(33);
+ eve_odd 
+---------
+ ODD
+(1 row)
+
+
+4.
+CREATE OR REPLACE FUNCTION sumof10() returns int as '
+DECLARE
+sum int :=0;
+i int :=1;
+BEGIN
+FOR i IN 1..10 LOOP
+sum:=sum+i;
+END LOOP;
+RETURN sum;
+END;
+'language 'plpgsql';
+
+fydb57=> select sumof10();
+ sumof10 
+---------
+      55
+(1 row)
+
+
+5.
+CREATE OR REPLACE FUNCTION oddof50() returns void as '
+BEGIN
+FOR i IN 1..50 LOOP
+IF i%2<>0 THEN
+raise notice ''%'',i;
+END IF;
+END LOOP;
+END;
+'language 'plpgsql';
+
+fydb57=> SELECT oddof50();
+NOTICE:  1
+NOTICE:  3
+NOTICE:  5
+NOTICE:  7
+NOTICE:  9
+NOTICE:  11
+NOTICE:  13
+NOTICE:  15
+NOTICE:  17
+NOTICE:  19
+NOTICE:  21
+NOTICE:  23
+NOTICE:  25
+NOTICE:  27
+NOTICE:  29
+NOTICE:  31
+NOTICE:  33
+NOTICE:  35
+NOTICE:  37
+NOTICE:  39
+NOTICE:  41
+NOTICE:  43
+NOTICE:  45
+NOTICE:  47
+NOTICE:  49
+ oddof50 
+---------
+ 
+(1 row)
+
+
+
+6.
+-- without input for 'n'
+CREATE OR REPLACE FUNCTION sum_avg() returns void as' 
+DECLARE
+sum int :=0;
+avg int;
+i int :=1;
+BEGIN
+FOR i IN 1..10 LOOP
+sum:=sum+i;
+END LOOP;
+avg := sum/i;
+raise notice ''Sum = % Avg = %'',sum,avg;
+END;
+'language 'plpgsql';
+
+fydb57=> select sum_avg();
+NOTICE:  Sum = 55 Avg = 55
+ sum_avg 
+---------
+ 
+(1 row)
+
+
+-- with input for n
+CREATE OR REPLACE FUNCTION sum_avg(a int) returns void as' 
+DECLARE
+sum int :=0;
+avg int;
+i int :=1;
+BEGIN
+FOR i IN 1..a LOOP
+sum:=sum+i;
+END LOOP;
+avg := sum/a;
+raise notice ''Sum = % Avg = %'',sum,avg;
+END;
+'language 'plpgsql';
+
+fydb57=> select sum_avg(20);
+NOTICE:  Sum = 210 Avg = 10
+ sum_avg 
+---------
+ 
+(1 row)
+
+----------------------------------------------------------------
+-------------------------------SET B----------------------------
+----------------------------------------------------------------
+
+CREATE TABLE project_emp(
+pno int references project,
+empno int references employee,
+start_date date,
+PRIMARY KEY (pno,empno)
+);
+
+CREATE TABLE project(
+pno int PRIMARY KEY,
+pname char(20),
+ptype varchar(30),
+duration int
+);
+
+fydb57=> SELECT * from employee;
+ empno |        ename         | city  | joining_date 
+-------+----------------------+-------+--------------
+     1 | James                | aa123 | 1992-02-20
+     2 | Jacob                | bb234 | 2005-04-06
+     3 | Alex                 | cc567 | 2000-01-23
+(3 rows)
+
+fydb57=> SELECT * from project;
+ pno |        pname         |  ptype  | duration 
+-----+----------------------+---------+----------
+   1 | System               | Windows |        3
+   2 | DBMS                 | Linux   |        5
+(2 rows)
+
+fydb57=> select * from project_emp;
+ pno | empno | start_date 
+-----+-------+------------
+   1 |     2 | 1999-03-02
+   2 |     1 | 1999-03-02
+   1 |     3 | 2000-12-01
+(3 rows)
+
+
+a.
+CREATE OR REPLACE FUNCTION getpname(project_number int) returns varchar as'
+DECLARE
+p_name varchar(20);
+BEGIN
+SELECT pname into p_name from project where pno=project_number;
+RETURN p_name;
+END;
+'language 'plpgsql';
+
+fydb57=> select getpname(1);
+ getpname 
+----------
+ System
+(1 row)
+
+b. 
+CREATE OR REPLACE FUNCTION getename(emp_name char) returns void as'
+DECLARE
+empcity varchar(20);
+emp_jd date;
+BEGIN
+SELECT city,joining_date into empcity, emp_jd from employee where ename=emp_name;
+raise notice ''Employee name - % Join Date = %, City = %'',emp_name,emp_jd,empcity;
+END;
+'language 'plpgsql';
+
+fydb57=> select getename('James');
+NOTICE:  Employee name - James Join Date = 1992-02-20, City = aa123
+ getename 
+----------
+ 
+(1 row)
+
+c.
+CREATE OR REPLACE FUNCTION empdets(empn int) returns void as'
+DECLARE
+emp_name char(20);
+empcity varchar(20);
+emp_jd date;
+BEGIN
+SELECT ename, city,joining_date into emp_name, empcity, emp_jd from employee where empno=empn;
+raise notice ''Employee name - % Join Date = %, City = %'',emp_name,emp_jd,empcity;
+END;
+'language 'plpgsql';
+
+fydb57=> select empdets(1);
+NOTICE:  Employee name - James Join Date = 1992-02-20, City = aa123
+ empdets 
+---------
+ 
+(1 row)
+
+
+d.
+CREATE OR REPLACE FUNCTION getpname(p_name char) returns void as'
+DECLARE
+countemp int;
+BEGIN
+SELECT count(*) into countemp from project_emp j ,project i where i.pname=p_name and i.pno=j.pno;
+raise notice ''Count = %'',countemp;
+END;
+'language 'plpgsql';
+
+fydb57=> select getpname('System');
+NOTICE:  Count = 2
+ getpname 
+----------
+ 
+(1 row)
+
+

@@ -1,0 +1,18 @@
+open sql
+==> $ psql -h 192.168.0.10 -d fydb57
+
+===> Syntax to create table -  <===
+
+create table 'table name'('table values');
+------------------------------------------
+
+===> To view table - <===
+\d 'table name'
+---------------
+
+===> To insert -  <===
+insert into 'table name' values ('value(s)');
+-------------------------------------------------------------
+
+
+

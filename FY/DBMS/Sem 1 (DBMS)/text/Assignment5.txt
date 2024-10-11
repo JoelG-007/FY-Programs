@@ -1,0 +1,69 @@
+CREATE TABLE project(
+pno int PRIMARY KEY,
+p_name varchar(20),
+duration int
+);
+
+CREATE TABLE employee1(
+eno int PRIMARY KEY,
+e_name varchar(30),
+qualification varchar(10),
+joindate date
+);
+
+CREATE TABLE project_emp(
+pno int references project(pno) ON DELETE CASCADE ON UPDATE SET NULL,
+eno int references employee1(eno) ON DELETE CASCADE ON UPDATE SET NULL,
+start_date date,
+hours int,
+PRIMARY KEY(pno,eno)
+);
+
+INSERT INTO project(pno, p_name, duration)
+VALUES
+(1,'System',2),(2,'Robotics',4),(3,'AI',7);
+
+INSERT INTO employee1(eno, e_name, qualification, joindate)
+VALUES
+(1,'Emp1','B.Tech','2020-01-15'),
+(2,'Emp2','M.Sc','2019-04-06'),
+(3,'Emp3','Ph.D','2018-03-16');
+
+1.
+SELECT employee1.e_name, project.p_name,project_hours
+FROM employee1, project, project_emp
+WHERE employee1.eno=project_emp.no AND project.pno=project_emp.pno AND project.pname='System';
+
+2.
+SELECT employee.eno
+FROM employee
+WHERE employee.eno NOT IN(SELECT pe.eno from project_emp pe WHERE pe.pno=ANY(SELECT project.pno FROM project WHERE project.p_name!='Robotics'));
+
+3.
+SELECT employee1.e_name
+FROM employee1, project,project_emp
+WHERE employee1.eno=project_emp.eno
+AND project.pno=project_emp.eno
+AND project_emp.start_date='2022-12-25';
+
+4. 
+SELECT employee.emp_name
+FROM employee
+WHERE employee.eno IN(SELECT pe.eno FROM project_emp pe WHERE pe.pno IN(
+SELECT project.pno FROM project WHERE duration>3));
+
+SET B
+1.
+SELECT e_name from employee4 e where e.salary>ANY(SELECT salary FROM employee4 WHERE city ='Pune';
+
+2.
+SELECT e_name from employee4 e WHERE e.salary>ALL(SELECT salary from employee4 where address = '123 aaa';
+
+3.
+Select d_name from department d where d.no=(Select e.dno from employee e GROUP by e.dno having count (*)=(Select max (empcount) from (Select dno0 count (*) as emp_countfrom employee group by dno) as department_count));
+
+4.
+SELECT e.name from employee e where e.salary=ANY(SELECT salary from employee WHere city ='Mumbai';
+
+5. 
+Select * from employee WHERE salary =(SELECT MAX(salary) from employee WHere salary<(SELEct max(salary) from employee);

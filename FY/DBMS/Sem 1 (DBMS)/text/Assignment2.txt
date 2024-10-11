@@ -1,0 +1,332 @@
+Set A 
+
+Q1. 
+
+CREATE TABLE Owner(
+	Owner_id int PRIMARY KEY,
+	name varchar(50),
+	Birth_date date,
+	Birth_place varchar(100)
+);
+
+fydb57=> \d owner
+               Table "public.owner"
+   Column    |          Type          | Modifiers 
+-------------+------------------------+-----------
+ owner_id    | integer                | not null
+ name        | character varying(50)  | 
+ birth_date  | date                   | 
+ birth_place | character varying(100) | 
+Indexes:
+    "owner_pkey" PRIMARY KEY, btree (owner_id)
+______________________________________________________________
+
+Q2.
+CREATE TABLE Student(
+	roll_no int,
+	class varchar(50),
+	weight numeric(6,2),
+	height numeric(6,2),
+	PRIMARY KEY (roll_no, class)
+);
+
+fydb57=> \d student
+           Table "public.student"
+ Column  |         Type          | Modifiers 
+---------+-----------------------+-----------
+ roll_no | integer               | not null
+ class   | character varying(50) | not null
+ weight  | numeric(6,2)          | 
+ height  | numeric(6,2)          | 
+Indexes:
+    "student_pkey" PRIMARY KEY, btree (roll_no, class)
+
+______________________________________________________________
+
+Q3.
+CREATE TABLE Project1(
+	project_id int PRIMARY KEY,
+	project_name varchar(30),
+	project_description text UNIQUE,
+	status boolean
+);
+
+fydb57=> \d Project1
+                 Table "public.project1"
+       Column        |         Type          | Modifiers 
+---------------------+-----------------------+-----------
+ project_id          | integer               | not null
+ project_name        | character varying(30) | 
+ project_description | text                  | 
+ status              | boolean               | 
+Indexes:
+    "project1_pkey" PRIMARY KEY, btree (project_id)
+    "project1_project_description_key" UNIQUE CONSTRAINT, btree (project_description)
+_______________________________________________________________
+
+Q4.
+CREATE TABLE Donor(
+	donor_no int PRIMARY KEY,
+	donor_name varchar(30) NOT NULL,
+	blood_group char(10)
+);
+
+fydb57=> \d donor
+              Table "public.donor"
+   Column    |         Type          | Modifiers 
+-------------+-----------------------+-----------
+ donor_no    | integer               | not null
+ donor_name  | character varying(30) | not null
+ blood_group | character(10)         | 
+Indexes:
+    "donor_pkey" PRIMARY KEY, btree (donor_no)
+______________________________________________________________
+
+Q5.
+CREATE TABLE Property(
+	property_id int PRIMARY KEY,
+	property_desc text NOT NULL,
+	area varchar(30),
+	rate float,
+	agri_status boolean
+);
+
+fydb57=> \d property
+              Table "public.property"
+    Column     |         Type          | Modifiers 
+---------------+-----------------------+-----------
+ property_id   | integer               | not null
+ property_desc | text                  | not null
+ area          | character varying(30) | 
+ rate          | double precision      | 
+ agri_status   | boolean               | 
+Indexes:
+    "property_pkey" PRIMARY KEY, btree (property_id)
+_____________________________________________________________
+
+Q6. 
+CREATE TABLE Actor(
+	actor_id int PRIMARY KEY,
+	actor_name varchar(50),
+	birth_date date NULL	
+);
+
+fydb57=> \d actor
+              Table "public.actor"
+   Column   |         Type          | Modifiers 
+------------+-----------------------+-----------
+ actor_id   | integer               | not null
+ actor_name | character varying(50) | 
+ birth_date | date                  | 
+Indexes:
+    "actor_pkey" PRIMARY KEY, btree (actor_id)
+
+______________________________________________________________
+
+Q7.
+CREATE TABLE Movie(
+	movie_no int PRIMARY KEY,
+	name varchar(50),
+	release_date date
+);
+
+fydb57=> \d movie
+               Table "public.movie"
+    Column    |         Type          | Modifiers 
+--------------+-----------------------+-----------
+ movie_no     | integer               | not null
+ name         | character varying(50) | 
+ release_date | date                  | 
+Indexes:
+    "movie_pkey" PRIMARY KEY, btree (movie_no)
+
+_________________________________________________________________
+
+Q8.
+CREATE TABLE Hospital(
+	hno int PRIMARY KEY,
+	hname varchar(50),
+	hcity varchar(30)
+);
+
+fydb57=> \d hospital
+          Table "public.hospital"
+ Column |         Type          | Modifiers 
+--------+-----------------------+-----------
+ hno    | integer               | not null
+ hname  | character varying(50) | 
+ hcity  | character varying(30) | 
+Indexes:
+    "hospital_pkey" PRIMARY KEY, btree (hno)
+
+__________________________________________________________________
+
+++++++++++++++++++++++++Output+++++++++++++++++++++++++++++++
+
+fydb57=> \d
+         List of relations
+ Schema |   Name   | Type  | Owner 
+--------+----------+-------+-------
+ public | actor    | table | fy57
+ public | donor    | table | fy57
+ public | hospital | table | fy57
+ public | movie    | table | fy57
+ public | owner    | table | fy57
+ public | project1 | table | fy57
+ public | property | table | fy57
+ public | student  | table | fy57
+(8 rows)
+
+========================== SET B ==============================
+
+Q1. 
+CREATE TABLE Employee(
+	Emp_id int PRIMARY KEY,
+	Emp_name varchar(50),
+	Emp_designation varchar(50) CHECK(Emp_designation IN('Manager','Staff','Worker'))
+);
+
+fydb57=> \d Employee
+               Table "public.employee"
+     Column      |         Type          | Modifiers 
+-----------------+-----------------------+-----------
+ emp_id          | integer               | not null
+ emp_name        | character varying(50) | 
+ emp_designation | character varying(50) | 
+Indexes:
+    "employee_pkey" PRIMARY KEY, btree (emp_id)
+Check constraints:
+    "employee_emp_designation_check" CHECK (emp_designation::text = ANY (ARRAY['Managetr'::character varying, 'Staff'::character varying, 'Worker'::character varying]::text[]))
+
+
+(CONTINUED FOR Q2.) 
+ALTER TABLE Employee
+ADD addr varchar(100);
+
+fydb57=> \d employee
+               Table "public.employee"
+     Column      |          Type          | Modifiers 
+-----------------+------------------------+-----------
+ emp_id          | integer                | not null
+ emp_name        | character varying(50)  | 
+ emp_designation | character varying(50)  | 
+ addr            | character varying(100) | 
+Indexes:
+    "employee_pkey" PRIMARY KEY, btree (emp_id)
+Check constraints:
+    "employee_emp_designation_check" CHECK (emp_designation::text = ANY (ARRAY['Managetr'::character varying, 'Staff'::character varying, 'Worker'::character varying]::text[]))
+_________________________________________________________
+
+Q3.
+CREATE TABLE Books(
+	id int,
+	title text NOT NULl,
+	sub_id int,
+	CONSTRAINT books_id_pkey PRIMARY KEY(id)
+);
+
+ALTER TABLE Books
+DROP COLUMN sub_id;
+
+fydb57=> ALTER TABLE Books
+fydb57-> DROP COLUMN sub_id;
+ALTER TABLE
+fydb57=> \d books
+     Table "public.books"
+ Column |  Type   | Modifiers 
+--------+---------+-----------
+ id     | integer | not null
+ title  | text    | not null
+Indexes:
+    "books_id_pkey" PRIMARY KEY, btree (id)
+__________________________________________________
+
+Q4.
+CREATE TABLE Sales_order(
+	order_no varchar(10) PRIMARY KEY,
+	order_date date,
+	salesman_no int UNIQUE
+);
+
+fydb57=> \d sales_order
+           Table "public.sales_order"
+   Column    |         Type          | Modifiers 
+-------------+-----------------------+-----------
+ order_no    | character varying(10) | not null
+ order_date  | date                  | 
+ salesman_no | integer               | 
+Indexes:
+    "sales_order_pkey" PRIMARY KEY, btree (order_no)
+    "sales_order_salesman_no_key" UNIQUE CONSTRAINT, btree (salesman_no)
+
+
+	ALTER TABLE Sales_order 
+	ALTER COLUMN salesman_no SET NOT NULL;
+
+fydb57=> \d sales_order
+           Table "public.sales_order"
+   Column    |         Type          | Modifiers 
+-------------+-----------------------+-----------
+ order_no    | character varying(10) | not null
+ order_date  | date                  | 
+ salesman_no | integer               | not null
+Indexes:
+    "sales_order_pkey" PRIMARY KEY, btree (order_no)
+    "sales_order_salesman_no_key" UNIQUE CONSTRAINT, btree (salesman_no)
+________________________________________________________________________
+
+Q5.
+DROP TABLE Hospital;
+
+fydb57=> DROP TABLE Hospital;
+DROP TABLE
+_______________________________________________________________________
+
+Q6.
+CREATE TABLE Machine(
+	mno char(20), 
+	name varchar(30)
+);
+
+fydb57=> \d machine
+           Table "public.machine"
+ Column |         Type          | Modifiers 
+--------+-----------------------+-----------
+ mno    | character(20)         | 
+ name   | character varying(30) | 
+
+
+ALTER TABLE Machine
+ADD PRIMARY KEY(mno);
+fydb57=> \d machine
+           Table "public.machine"
+ Column |         Type          | Modifiers 
+--------+-----------------------+-----------
+ mno    | character(20)         | not null
+ name   | character varying(30) | 
+Indexes:
+    "machine_pkey" PRIMARY KEY, btree (mno)
+__________________________________________________________________________
+
+Q7. 
+ALTER TABLE donor
+RENAME TO donor1;
+
+ALTER TABLE donor
+RENAME TO donor1;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

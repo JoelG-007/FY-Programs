@@ -1,0 +1,66 @@
+Aug 25 
+$date
+	%m
+	%h
+	%d
+	%y 
+$cal
+
+-------------------------------------------------------------------------------
+Steps to save a file
+1. esc
+2. shift+wq!
+3. enter
+-------------------------------------------------------------------------------
+
+File Handling
+$cat "file name" - opens file in read/view mode
+
+$vi "file name" - open in read mode and can switch to write by pressing insert
+
+$ls - lists all files in the directory 
+	> attributes 
+	1. $ls -a - lists  hidden files
+	2. $ls -l - lists the permission informations along with the other 
+		    informations such as date of last modifications,
+		    size of blocks, etc. 
+		    The first column of the output exhibits the file type &
+		    permissions
+
+$mkdir "name" - creates a directory; multiple directories can also be created 
+		as $mkdir dir1 dir2
+
+$cd "directory name" - opens directory in terminal 
+		       To exit - cd ..
+
+$rmdir "directory name" - removes selected directory
+
+$rm "file name" - removes selected file
+
+$rm "*file name" - removs all files with the entered letter
+
+$cp "file name -> new_file name" - creates a copy of selected file with a 
+                                   different name
+
+$mv "file name ->  new_file name" - renames the file
+
+$mv "file name -> folder name" - moves the file to different directory
+
+$wc -attribute "file name"
+	>attribute
+	-c ==> displays no. of letters
+	-w ==> displays no. of words
+	-b ==> displays bytes
+
+$grep "word" - displays no. of times the word has been entered
+	>attribute
+	-n ==> displays the line with the word entered
+
+$man "command name" - opens manual
+
+$clear - clears terminal 
+
+$who - shows lists of user currently logged in
+
+$tail - prints the last lines of a txt file
+	
